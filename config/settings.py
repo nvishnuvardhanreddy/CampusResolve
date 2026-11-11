@@ -17,6 +17,10 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'dev-only-change-me-before-deploymen
 if not DEBUG and (not SECRET_KEY or SECRET_KEY == 'dev-only-change-me-before-deployment'):
     raise ImproperlyConfigured('Set DJANGO_SECRET_KEY to a unique secret value in production.')
 ALLOWED_HOSTS = [host.strip() for host in os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') if host.strip()]
+# Railway healthchecks use this Host header; the public domain is injected by Railway.
+for _extra_host in ('healthcheck.railway.app', os.getenv('RAILWAY_PUBLIC_DOMAIN', '').strip()):
+    if _extra_host and _extra_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_extra_host)
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if origin.strip()]
 
 INSTALLED_APPS = [
@@ -88,6 +92,7 @@ OTP_RESEND_SECONDS = 60
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 SECURE_SSL_REDIRECT = not DEBUG
+SECURE_REDIRECT_EXEMPT = [r'^healthz/$']
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
