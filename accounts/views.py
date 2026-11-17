@@ -7,11 +7,44 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.mail import send_mail
+from django.http import Http404
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from .forms import SignUpForm
+from .forms import ProfileForm, SignUpForm
 from .models import EmailOTP
+
+DEMO_ACCOUNTS = {
+    'student1': ('student1@demo.campusresolve.local', 'student'),
+    'student2': ('student2@demo.campusresolve.local', 'student'),
+    'faculty1': ('faculty1@demo.campusresolve.local', 'faculty'),
+    'faculty2': ('faculty2@demo.campusresolve.local', 'faculty'),
+    'hod': ('hod.csd@demo.campusresolve.local', 'hod'),
+    'maintenance': ('maintenance@demo.campusresolve.local', 'maintenance'),
+    'library': ('library@demo.campusresolve.local', 'library'),
+    'admin': ('admin@demo.campusresolve.local', 'admin'),
+}
+
+@require_POST
+def demo_login(request):
+    if not settings.DEBUG:
+        raise Http404
+    demo_id = request.POST.get('account', '')
+    account = DEMO_ACCOUNTS.get(demo_id)
+    if not account:
+        raise Http404
+    email, role = account
+    from .models import User
+    user = User.objects.filter(
+        email=email, role=role, email_verified=True, is_active=True,
+    ).first()
+    if not user or (role == 'faculty' and not user.faculty_approved):
+        raise Http404
+    if role == 'admin' and not user.is_superuser:
+        raise Http404
+    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    messages.success(request, f'Signed in to the local demo as {user.get_role_display()}.')
+    return redirect('dashboard')
 
 def send_code(user):
     now = timezone.now()
@@ -41,6 +74,15 @@ def signup(request):
             messages.error(request, 'We could not send the verification email. Check the email settings and try sending a new code.')
         return redirect('verify_email')
     return render(request, 'accounts/signup.html', {'form': form})
+
+@login_required
+def profile(request):
+    form = ProfileForm(request.POST or None, instance=request.user)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Your profile has been updated.')
+        return redirect('profile')
+    return render(request, 'accounts/profile.html', {'form': form})
 
 def verify_email(request):
     user_id = request.session.get('pending_verification_user')

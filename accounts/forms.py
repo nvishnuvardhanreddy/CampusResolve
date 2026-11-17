@@ -12,7 +12,7 @@ class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=150, label='Full name')
     email = forms.EmailField()
     role = forms.ChoiceField(choices=[(User.Role.STUDENT, 'Student'), (User.Role.FACULTY, 'Faculty')])
-    branch = forms.ChoiceField(choices=User.Branch.choices)
+    branch = forms.ChoiceField(choices=User.Branch.choices, label='Department')
     class Meta:
         model = User
         fields = ('first_name', 'username', 'email', 'role', 'branch')
@@ -29,3 +29,11 @@ class SignUpForm(UserCreationForm):
         user.branch = self.cleaned_data['branch']
         if commit: user.save()
         return user
+
+class ProfileForm(forms.ModelForm):
+    branch = forms.ChoiceField(choices=[('', 'Select department')] + list(User.Branch.choices), label='Department')
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'username', 'branch')
+        labels = {'first_name': 'Full name', 'username': 'Username'}

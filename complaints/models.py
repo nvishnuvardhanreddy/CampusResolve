@@ -9,15 +9,31 @@ class Complaint(models.Model):
         PROGRESS = 'progress', 'In progress'
         RESOLVED = 'resolved', 'Resolved'
         CLOSED = 'closed', 'Closed'
+    class AssignmentUnit(models.TextChoices):
+        DEPARTMENT = 'department', 'Department faculty'
+        LIBRARY = 'library', 'Library'
+        FACILITIES = 'facilities', 'Facilities / Maintenance'
+        ADMINISTRATION = 'administration', 'Administration'
+        HOSTEL = 'hostel', 'Hostel'
+        TRANSPORT = 'transport', 'Transport'
+        IT_SUPPORT = 'it_support', 'IT support'
+        EXAMINATIONS = 'examinations', 'Examinations'
+        ACCOUNTS = 'accounts', 'Accounts / Finance'
+        STUDENT_SUPPORT = 'student_support', 'Student support'
+        ANTI_RAGGING = 'anti_ragging', 'Anti-ragging committee'
+        OTHER = 'other', 'Other'
     CATEGORIES = [
-        ('academics','Academics'), ('facilities','Facilities'),
+        ('academics','Academics'), ('library','Library'), ('facilities','Facilities'),
         ('harassment','Harassment'), ('ragging','Ragging / Bullying'),
         ('administration','Administration'), ('other','Other'),
+        ('hostel','Hostel'), ('transport','Transport'), ('it_support','IT support'),
+        ('examinations','Examinations'), ('accounts','Accounts / Finance'),
     ]
     reference = models.CharField(max_length=12, unique=True, editable=False)
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='complaints')
     assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_complaints')
     category = models.CharField(max_length=60, choices=CATEGORIES)
+    assigned_unit = models.CharField(max_length=20, choices=AssignmentUnit.choices, default=AssignmentUnit.OTHER)
     title = models.CharField(max_length=160)
     description = models.TextField()
     status = models.CharField(max_length=12, choices=Status.choices, default=Status.SUBMITTED)

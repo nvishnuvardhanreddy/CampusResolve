@@ -1,1 +1,41 @@
-{% extends 'base.html' %}{% block title %}{{ complaint.reference }} · Campus Resolve{% endblock %}{% block content %}<a class="back" href="{% url 'dashboard' %}">← Back to dashboard</a><div class="detail-head"><div><div class="eyebrow">CASE {{ complaint.reference }}</div><h1>{{ complaint.title }}</h1><p>{{ complaint.get_category_display }} · {{ complaint.student.get_branch_display|default:'Branch not set' }} · Submitted {{ complaint.created_at|date:'M j, Y' }}</p></div><span class="status {{ complaint.status }}">{{ complaint.get_status_display }}</span></div><div class="detail-grid"><section class="panel"><h2>Complaint details</h2><p class="preserve">{{ complaint.description }}</p>{% if complaint.resolution %}<h3>Resolution</h3><p class="preserve">{{ complaint.resolution }}</p>{% endif %}<h2>Updates</h2>{% for update in updates %}<div class="update"><small>{{ update.created_at|date:'M j, Y · g:i a' }}{% if update.author %} · {{ update.author.get_full_name|default:update.author.username }}{% endif %}</small><p class="preserve">{{ update.message }}</p></div>{% empty %}<p class="subtle">There are no updates yet.</p>{% endfor %}</section>{% if staff_access %}<aside class="panel"><h2>Update complaint</h2><form method="post">{% csrf_token %}{{ form.as_p }}<button class="button">Save update</button></form><p class="subtle">Uncheck “Visible to student” to keep a progress note internal.</p></aside>{% endif %}</div>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}{{ complaint.reference }} · Campus Resolve{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'dashboard' %}">← Back to dashboard</a>
+<div class="detail-head">
+  <div>
+    <div class="eyebrow">CASE {{ complaint.reference }}</div>
+    <h1>{{ complaint.title }}</h1>
+    <p>{{ complaint.get_category_display }} · {{ complaint.student.get_branch_display|default:'Department not set' }} · Submitted {{ complaint.created_at|date:'M j, Y' }}</p>
+    <p class="subtle">Assigned unit: {{ complaint.get_assigned_unit_display }}{% if complaint.assigned_to %} · Assigned to: {{ complaint.assigned_to.get_full_name|default:complaint.assigned_to.username }}{% else %} · Not assigned yet{% endif %}</p>
+  </div>
+  <span class="status {{ complaint.status }}">{{ complaint.get_status_display }}</span>
+</div>
+<div class="detail-grid">
+  <section class="panel">
+    <h2>Complaint details</h2>
+    <p class="preserve">{{ complaint.description }}</p>
+    {% if complaint.resolution %}<h3>Resolution</h3><p class="preserve">{{ complaint.resolution }}</p>{% endif %}
+    <h2>Updates</h2>
+    {% for update in updates %}
+      <div class="update"><small>{{ update.created_at|date:'M j, Y · g:i a' }}{% if update.author %} · {{ update.author.get_full_name|default:update.author.username }}{% endif %}</small><p class="preserve">{{ update.message }}</p></div>
+    {% empty %}<p class="subtle">There are no updates yet.</p>{% endfor %}
+  </section>
+  <div>
+    {% if administrator %}
+      <section class="panel">
+        <h2>Assign complaint</h2>
+        <p class="subtle">Choose the responsible department or service team, then select a matching faculty or staff account.</p>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="assign">{{ assignment_form.as_p }}<button class="button">Save assignment</button></form>
+      </section>
+    {% endif %}
+    {% if staff_access %}
+      <section class="panel" style="margin-top:18px">
+        <h2>Update progress</h2>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="update">{{ form.as_p }}<button class="button">Save progress</button></form>
+        <p class="subtle">Uncheck “Visible to student” to keep a progress note internal.</p>
+      </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}My profile · Campus Resolve{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><div class="eyebrow">ACCOUNT</div><h1>My profile</h1><p>View your account details and update your profile.</p></div>
+</div>
+<div class="detail-grid profile-grid">
+  <section class="panel">
+    <h2>Account details</h2>
+    <dl class="profile-details">
+      <div><dt>Full name</dt><dd>{{ user.get_full_name|default:'Not set' }}</dd></div>
+      <div><dt>Email</dt><dd>{{ user.email }}</dd></div>
+      <div><dt>Role</dt><dd>{{ user.get_role_display }}</dd></div>
+      <div><dt>Department</dt><dd>{{ user.get_branch_display|default:'Not set' }}</dd></div>
+      <div><dt>Email verification</dt><dd>{% if user.email_verified %}Verified{% else %}Not verified{% endif %}</dd></div>
+      {% if user.role == 'faculty' %}<div><dt>Faculty approval</dt><dd>{% if user.faculty_approved %}Approved{% else %}Pending approval{% endif %}</dd></div>{% endif %}
+    </dl>
+    <a class="button secondary" href="{% url 'password_change' %}">Change password</a>
+  </section>
+  <section class="panel">
+    <h2>Edit profile</h2>
+    <p class="subtle">Email and role are read-only. Contact an administrator if either needs correction.</p>
+    <form method="post">{% csrf_token %}{{ form.as_p }}<button class="button">Save profile</button></form>
+  </section>
+</div>
+{% endblock %}

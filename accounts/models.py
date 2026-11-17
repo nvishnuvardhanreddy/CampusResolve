@@ -5,6 +5,9 @@ class User(AbstractUser):
     class Role(models.TextChoices):
         STUDENT = 'student', 'Student'
         FACULTY = 'faculty', 'Faculty'
+        HOD = 'hod', 'Head of Department'
+        MAINTENANCE = 'maintenance', 'Maintenance staff'
+        LIBRARY = 'library', 'Library staff'
         ADMIN = 'admin', 'Administrator'
     class Branch(models.TextChoices):
         CSE = 'CSE', 'CSE'

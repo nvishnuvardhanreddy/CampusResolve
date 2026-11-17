@@ -1,1 +1,30 @@
-{% extends 'base.html' %}{% block title %}Sign in · Campus Resolve{% endblock %}{% block content %}<div class="panel narrow"><div class="eyebrow">WELCOME BACK</div><h1>Sign in</h1><form method="post">{% csrf_token %}{{ form.as_p }}<button class="button">Sign in</button></form><p class="subtle">New here? <a href="{% url 'signup' %}">Create a student account</a></p></div>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Sign in · Campus Resolve{% endblock %}
+{% block content %}
+<div class="panel narrow login-panel">
+  <div class="eyebrow">WELCOME BACK</div>
+  <h1>Sign in</h1>
+  <form method="post">{% csrf_token %}{{ form.as_p }}<button class="button">Sign in</button></form>
+  <p class="subtle">New here? <a href="{% url 'signup' %}">Create a student account</a></p>
+  {% if show_demo_accounts %}
+  <section class="demo-access" aria-label="Local demo accounts">
+    <div class="demo-heading">
+      <div class="demo-mark" aria-hidden="true">CR</div>
+      <div><span class="demo-pill"><span aria-hidden="true">&#9635;</span> LOCAL DEMO</span><h2>Try a demo account</h2></div>
+    </div>
+    <p class="subtle demo-intro">Select a role to open its dashboard directly. No password or OTP is required for these local demo accounts.</p>
+    <div class="demo-account-list">
+      <form method="post" action="{% url 'demo_login' %}">{% csrf_token %}<input type="hidden" name="account" value="student1"><button class="demo-card demo-student" type="submit"><span class="demo-avatar">S</span><span class="demo-account-info"><strong>Student 1</strong><small>student1@demo.campusresolve.local</small></span><span class="demo-tag">CSD</span><span class="demo-arrow" aria-hidden="true">&#8250;</span></button></form>
+      <form method="post" action="{% url 'demo_login' %}">{% csrf_token %}<input type="hidden" name="account" value="student2"><button class="demo-card demo-student" type="submit"><span class="demo-avatar">S</span><span class="demo-account-info"><strong>Student 2</strong><small>student2@demo.campusresolve.local</small></span><span class="demo-tag">CSD</span><span class="demo-arrow" aria-hidden="true">&#8250;</span></button></form>
+      <form method="post" action="{% url 'demo_login' %}">{% csrf_token %}<input type="hidden" name="account" value="faculty1"><button class="demo-card demo-faculty" type="submit"><span class="demo-avatar">F</span><span class="demo-account-info"><strong>Faculty 1</strong><small>faculty1@demo.campusresolve.local</small></span><span class="demo-tag">CSD</span><span class="demo-arrow" aria-hidden="true">&#8250;</span></button></form>
+      <form method="post" action="{% url 'demo_login' %}">{% csrf_token %}<input type="hidden" name="account" value="faculty2"><button class="demo-card demo-faculty" type="submit"><span class="demo-avatar">F</span><span class="demo-account-info"><strong>Faculty 2</strong><small>faculty2@demo.campusresolve.local</small></span><span class="demo-tag">CSD</span><span class="demo-arrow" aria-hidden="true">&#8250;</span></button></form>
+      <form method="post" action="{% url 'demo_login' %}">{% csrf_token %}<input type="hidden" name="account" value="hod"><button class="demo-card demo-hod" type="submit"><span class="demo-avatar">H</span><span class="demo-account-info"><strong>CSD HOD</strong><small>hod.csd@demo.campusresolve.local</small></span><span class="demo-tag">HOD</span><span class="demo-arrow" aria-hidden="true">&#8250;</span></button></form>
+      <form method="post" action="{% url 'demo_login' %}">{% csrf_token %}<input type="hidden" name="account" value="library"><button class="demo-card demo-service" type="submit"><span class="demo-avatar">L</span><span class="demo-account-info"><strong>Library Desk</strong><small>library@demo.campusresolve.local</small></span><span class="demo-tag">LIBRARY</span><span class="demo-arrow" aria-hidden="true">&#8250;</span></button></form>
+      <form method="post" action="{% url 'demo_login' %}">{% csrf_token %}<input type="hidden" name="account" value="maintenance"><button class="demo-card demo-service" type="submit"><span class="demo-avatar">M</span><span class="demo-account-info"><strong>Maintenance Desk</strong><small>maintenance@demo.campusresolve.local</small></span><span class="demo-tag">SERVICE</span><span class="demo-arrow" aria-hidden="true">&#8250;</span></button></form>
+      <form method="post" action="{% url 'demo_login' %}">{% csrf_token %}<input type="hidden" name="account" value="admin"><button class="demo-card demo-admin" type="submit"><span class="demo-avatar">A</span><span class="demo-account-info"><strong>System Admin</strong><small>admin@demo.campusresolve.local</small></span><span class="demo-tag">ADMIN</span><span class="demo-arrow" aria-hidden="true">&#8250;</span></button></form>
+    </div>
+    <p class="demo-note"><strong>Local demo only.</strong> One-click sign-in is disabled in production.</p>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
